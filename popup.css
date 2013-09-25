@@ -1,0 +1,63 @@
+body {
+  padding: 10px;
+  text-align: right;
+}
+
+#content {
+  display: none;
+  text-align: left;
+}
+
+.fieldset {
+  display: block;
+  position: relative;
+  width: 200px;
+  height: 25px;
+}
+
+.fieldset input {
+  position: absolute;
+  top: 0;
+  left: 0;
+  background: transparent;
+  z-index: 2;
+  padding: 3%;
+  width: 94%;
+  border: none;
+  box-shadow: 0 0 1px 1px #ccc;
+}
+
+input:disabled {
+  color: #888;
+}
+
+#autocomplete {
+  z-index: 1;
+}
+
+.clear_lnk {
+  float: right;
+}
+
+.connections {
+  padding-left: 0;
+  list-style: none;
+  max-height: 200px;
+  overflow: auto;
+}
+.connection span {
+  color: gray;
+  font-size: 0.8em;  
+}
+
+.graph {
+  display: none;
+}
+
+svg {
+  display: block;
+}
+
+svg text {
+  font-size: 10px;
+}
