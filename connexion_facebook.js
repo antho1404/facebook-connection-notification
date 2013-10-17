@@ -26,17 +26,17 @@ var storeEndConnection = function(id, callback) {
 };
 
 var clearMissingTime = function(connections) {
-  for(var i=0; i<connections.length; i++) {
-    if(!connections[i]['end']) {
-      if(i === connections.length - 1)
-        connections[i]['end'] = (new Date()).getTime();
-      else {
-        var begin = new Date(connections['start']);
-        var end   = new Date(begin.getFullYear(), begin.getMonth(), begin.getDate(), 23, 59, 59);
-        connections[i]['end'] = end.getTime();
-      }
-    }
-  }
+  // for(var i=0; i<connections.length; i++) {
+  //   if(!connections[i]['end']) {
+  //     if(i === connections.length - 1)
+  //       connections[i]['end'] = (new Date()).getTime();
+  //     else {
+  //       var begin = new Date(connections['start']);
+  //       var end   = new Date(begin.getFullYear(), begin.getMonth(), begin.getDate(), 23, 59, 59);
+  //       connections[i]['end'] = end.getTime();
+  //     }
+  //   }
+  // }
 };
 
 var playSound = function(id) {

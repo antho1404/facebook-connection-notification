@@ -1,20 +1,21 @@
 var optimizedConnections = function(connections) {
-  if(!connections) return null;
-  var filtered_connections = [];
-  for(var i=0; i<connections.length; i++) {
-    var item = connections[i];
-    var last = filtered_connections.length > 0 ? filtered_connections[filtered_connections.length - 1] : null;
-    if(!last) {
-      filtered_connections.push(item);
-      continue;
-    }
-    if(item.start <= last.end + 30 * 1000) {
-      last.end = item.end;
-    } else {
-      filtered_connections.push(item);
-    }
-  }
   return connections;
+  // if(!connections) return null;
+  // var filtered_connections = [];
+  // for(var i=0; i<connections.length; i++) {
+  //   var item = connections[i];
+  //   var last = filtered_connections.length > 0 ? filtered_connections[filtered_connections.length - 1] : null;
+  //   if(!last) {
+  //     filtered_connections.push(item);
+  //     continue;
+  //   }
+  //   if(item.start <= last.end + 30 * 1000) {
+  //     last.end = item.end;
+  //   } else {
+  //     filtered_connections.push(item);
+  //   }
+  // }
+  // return connections;
 };
 
 

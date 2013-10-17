@@ -1,9 +1,10 @@
 var initializeSvg = function(options) {
-  var svg = document.querySelector("svg");
-  svg.setAttribute("width", options.width + 2 * options.marges);
-  svg.setAttribute("height", options.height + 2 * options.marges);
+  var chart = document.querySelector(".graph");
 
-  var texts = svg.querySelectorAll("text");
+  chart.setAttribute("width", options.width + 2 * options.marges);
+  chart.setAttribute("height", options.height + 2 * options.marges);
+
+  var texts = chart.querySelectorAll("text");
   for(var i=0; i<texts.length; i++) {
     var text = texts[i];
     var text_value = "";
@@ -35,9 +36,9 @@ var initializeSvg = function(options) {
     }
   }
 
-  var axistag = svg.querySelector("path#axis");
-  var separtaor_x = svg.querySelectorAll("text.x").length;
-  var separtaor_y = svg.querySelectorAll("text.y").length;
+  var axistag = chart.querySelector("path#axis");
+  var separtaor_x = chart.querySelectorAll("text.x").length;
+  var separtaor_y = chart.querySelectorAll("text.y").length;
   var axis = [];
   axis.push("M" + options.marges + " " + options.marges);
   for(var sy=0; sy<separtaor_y; sy++) {
@@ -51,7 +52,7 @@ var initializeSvg = function(options) {
     axis.push("L" + (options.marges + sx * options.width / (separtaor_x - 1)) + " " + (options.height + options.marges));
   }
   axistag.setAttribute("d", axis.join(" "));
-  return svg;
+  return chart;
 };
 
 
@@ -93,9 +94,9 @@ graph.addEventListener("click", function(ev) {
         x++;
       }
 
-      var svg = initializeSvg(options);
+      var chart = initializeSvg(options);
 
-      var pathtag = svg.querySelector("path#data");
+      var pathtag = chart.querySelector("path#data");
       pathtag.setAttribute("d", path.join(" "));
 
       document.querySelector("#content .graph").style.display = "block";
