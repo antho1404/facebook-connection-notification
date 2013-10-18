@@ -3,7 +3,7 @@
 
   "name": "Facebook connect notifier",
   "description": "Play sound when someone connect",
-  "version": "1.0",
+  "version": "1.1",
   "icons": {
     "48": "icon.png"
   },
@@ -11,12 +11,8 @@
   "content_scripts": [
     {
       "matches": ["https://www.facebook.com/*"],
-      "js": ["config.js", "tools.js", "connexion_facebook.js"]
+      "js": ["compiled/plugin.js"]
     }
   ],
-  "browser_action": {
-    "default_icon": "icon.png",
-    "default_popup": "popup.html"
-  },
   "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'"
 }

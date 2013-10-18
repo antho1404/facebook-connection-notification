@@ -1,0 +1,3 @@
+#!/bin/bash
+
+coffee --join plugin.js --bare --output compiled --watch --compile js/lib js/models/_model.coffee js/models/user.coffee js/models/connexion.coffee js/plugin/graph.coffee js/plugin/connexions.coffee js/plugin/display.coffee js/plugin/plugin.coffee
