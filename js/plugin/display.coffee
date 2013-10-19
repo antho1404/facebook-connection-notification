@@ -43,8 +43,8 @@ displayGraph = (id) ->
     navigation.innerHTML = """<li><div class="pagesNavMenuTitle fsm fwn fcg">Graph #{user.get("nickname")}:</div></li>"""
     navigation.innerHTML += """<li class="graph"></li>"""
 
+    graph = new Graph navigation.querySelector(".graph")
     user.connexionsGrouped 24, (connexions) ->
-      graph = new Graph navigation.querySelector(".graph")
       graph.display connexions
 
 displayFriends = ->

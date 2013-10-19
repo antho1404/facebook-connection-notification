@@ -377,13 +377,13 @@ User = (function(_super) {
 
   User.prototype.connexionsGrouped = function(size, callback) {
     var c, connexions, count, sql, _i, _len;
-    sql = "SELECT ? as minute, COUNT(*) as count\nFROM (\n  SELECT  CAST(((CAST(start AS FLOAT) / " + size + ") - CAST(start / " + size + " AS INTEGER)) * " + size + " AS INTEGER) as min_start, \n          CAST(((CAST(end   AS FLOAT) / " + size + ") - CAST(end   / " + size + " AS INTEGER)) * " + size + " AS INTEGER) as min_end\n  FROM Connexions\n  WHERE user_id = ? AND end IS NOT NULL\n)\nWHERE ? BETWEEN min_start AND min_end";
+    sql = "SELECT ? as step, COUNT(*) as count\nFROM (\n  SELECT  CAST(((CAST(start AS FLOAT) / " + size + ") - CAST(start / " + size + " AS INTEGER)) * " + size + " AS INTEGER) as min_start, \n          CAST(((CAST(end   AS FLOAT) / " + size + ") - CAST(end   / " + size + " AS INTEGER)) * " + size + " AS INTEGER) as min_end\n  FROM Connexions\n  WHERE user_id = ? AND end IS NOT NULL\n)\nWHERE ? BETWEEN min_start AND min_end";
     connexions = new Array(size);
     count = 0;
     for (_i = 0, _len = connexions.length; _i < _len; _i++) {
       c = connexions[_i];
       Connexion.sql(sql, [_i, this.get("id"), _i], function(tx, results) {
-        connexions[results.rows.item(0).minute] = results.rows.item(0).count;
+        connexions[results.rows.item(0).step] = results.rows.item(0).count;
         count++;
         if (count === connexions.length) {
           return callback(connexions);
@@ -490,30 +490,41 @@ Graph = (function() {
   };
 
   function Graph(elem) {
-    var height, width;
+    var height, template, width;
     this.elem = elem;
     width = this.options.width + 2 * this.options.marges;
     height = this.options.height + 2 * this.options.marges;
+    template = "<svg xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\" width=\"" + width + "\" height=\"" + height + "\">\n  <g>\n    <path id=\"graph-data\" stroke-width=\"1\" stroke=\"#aaa\" fill=\"#bbb\"></path>\n    <line x1=\"" + this.options.marges + "\" x2=\"" + this.options.marges + "\" y1=\"" + this.options.marges + "\" y2=\"" + (this.options.marges + this.options.height) + "\" stroke=\"black\" stroke-width=\"q\"/>\n    <line x1=\"" + this.options.marges + "\" x2=\"" + (this.options.marges + this.options.width) + "\" y1=\"" + (this.options.marges + this.options.height) + "\" y2=\"" + (this.options.marges + this.options.height) + "\" stroke=\"black\" stroke-width=\"1\"/>\n    <text id=\"ymax\" x=\"" + (this.options.marges - this.options.textshift) + "\" y=\"" + this.options.marges + "\"></text>\n    <text id=\"half-ymax\" x=\"" + (this.options.marges - this.options.textshift) + "\" y=\"" + ((this.options.marges + this.options.marges + this.options.height) / 2) + "\"></text>\n    <text x=\"" + (this.options.marges - this.options.textshift) + "\" y=\"" + (this.options.marges + this.options.height + this.options.textshift) + "\">0</text>\n    <text x=\"" + ((this.options.marges + this.options.marges + this.options.width) / 2) + "\" y=\"" + (this.options.marges + this.options.height + this.options.textshift) + "\">" + (this.options.max.x / 2) + "</text>\n    <text x=\"" + (this.options.marges + this.options.width) + "\" y=\"" + (this.options.marges + this.options.height + this.options.textshift) + "\">" + this.options.max.x + "</text>\n  </g>\n</svg>";
     this.elem.setAttribute("width", width);
     this.elem.setAttribute("height", height);
-    this.elem.innerHTML = "<svg xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\" width=\"" + width + "\" height=\"" + height + "\"><g><path stroke-width=\"1\" stroke=\"#aaa\" fill=\"#bbb\"></path></g></svg>";
-    this.path_elem = this.elem.querySelector("path");
+    this.elem.innerHTML = template;
+    this.path_elem = this.elem.querySelector("#graph-data");
   }
 
+  Graph.prototype.updateScale = function() {
+    var max;
+    max = this.max();
+    this.elem.querySelector("#half-ymax").textContent = max / 2;
+    return this.elem.querySelector("#ymax").textContent = max;
+  };
+
   Graph.prototype.max = function() {
-    var d, max, _i, _len, _ref2;
+    var d, _i, _len, _ref2;
     if (!this.data) {
       return;
     }
-    max = 0;
+    if (this._max) {
+      return this._max;
+    }
+    this._max = 0;
     _ref2 = this.data;
     for (_i = 0, _len = _ref2.length; _i < _len; _i++) {
       d = _ref2[_i];
-      if (d > max) {
-        max = d;
+      if (d > this._max) {
+        this._max = d;
       }
     }
-    return max;
+    return this._max;
   };
 
   Graph.prototype.step = function() {
@@ -531,6 +542,7 @@ Graph = (function() {
   Graph.prototype.display = function(data) {
     var avg, avgNormalized, end, i, number, path, sum, x;
     this.data = data;
+    this.updateScale();
     i = 0;
     x = this.options.marges;
     path = ["M" + this.options.marges + " " + (this.options.height + this.options.marges)];
@@ -546,9 +558,9 @@ Graph = (function() {
       avg = sum / number;
       avgNormalized = parseInt((this.options.height + this.options.marges) - avg * this.options.height / this.max(), 10);
       path.push("L" + x + " " + avgNormalized);
-      x += parseInt(this.options.width / this.data.length) || 1;
+      x += parseInt(this.options.width / (this.data.length - 1)) || 1;
     }
-    x -= parseInt(this.options.width / this.data.length) || 1;
+    x -= parseInt(this.options.width / (this.data.length - 1)) || 1;
     path.push("L" + x + " " + (this.options.height + this.options.marges));
     return this.path_elem.setAttribute("d", path.join(" "));
   };
@@ -673,14 +685,14 @@ displayGraph = function(id) {
     where: ["id = ?", [id]],
     limit: 1
   }, function(user) {
+    var graph;
     if (!user) {
       throw "error with user id...";
     }
     navigation.innerHTML = "<li><div class=\"pagesNavMenuTitle fsm fwn fcg\">Graph " + (user.get("nickname")) + ":</div></li>";
     navigation.innerHTML += "<li class=\"graph\"></li>";
+    graph = new Graph(navigation.querySelector(".graph"));
     return user.connexionsGrouped(24, function(connexions) {
-      var graph;
-      graph = new Graph(navigation.querySelector(".graph"));
       return graph.display(connexions);
     });
   });

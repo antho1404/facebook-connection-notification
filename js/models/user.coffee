@@ -11,7 +11,7 @@ class User extends Model
 
   connexionsGrouped: (size, callback) ->
     sql = """
-      SELECT ? as minute, COUNT(*) as count
+      SELECT ? as step, COUNT(*) as count
       FROM (
         SELECT  CAST(((CAST(start AS FLOAT) / #{size}) - CAST(start / #{size} AS INTEGER)) * #{size} AS INTEGER) as min_start, 
                 CAST(((CAST(end   AS FLOAT) / #{size}) - CAST(end   / #{size} AS INTEGER)) * #{size} AS INTEGER) as min_end
@@ -25,7 +25,7 @@ class User extends Model
     count = 0
     for c in connexions
       Connexion.sql sql, [_i, @get("id"), _i], (tx, results) ->
-        connexions[results.rows.item(0).minute] = results.rows.item(0).count
+        connexions[results.rows.item(0).step] = results.rows.item(0).count
         count++
         if count is connexions.length
           callback connexions
